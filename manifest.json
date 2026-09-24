@@ -2,8 +2,8 @@
   "id": "kdeconnect-status",
   "name": "KDE Connect",
   "version": "0.1.0",
-  "author": "vampirejsv \u003cvampirejsv@local\u003e",
-  "description": "KDE Connect is a Ryoku shell plugin.",
+  "author": "vampirejsv <vampirejsv@local>",
+  "description": "Live KDE Connect device status on the bar: connection, battery, unread notification count. Read-only, no actions.",
   "license": "MIT",
   "official": false,
   "hosts": [
@@ -15,9 +15,11 @@
     "panel": "content/Panel.qml"
   },
   "panel": {
-    "width": 320
+    "width": 280
   },
-  "files": [],
+  "files": [
+    "bin/poll.sh"
+  ],
   "capabilities": {
     "densities": [
       "glyph",
@@ -29,16 +31,21 @@
     "label": "KDE Connect"
   },
   "dependencies": {
-    "commands": []
+    "commands": [
+      "busctl",
+      "jq"
+    ]
   },
   "metadata": {
     "settings": [
       {
-        "key": "showCount",
-        "type": "toggle",
-        "label": "Show the tick count",
+        "key": "pollSeconds",
+        "type": "int",
+        "label": "Refresh interval (s)",
         "group": "KDE Connect",
-        "default": true
+        "default": 10,
+        "min": 3,
+        "max": 60
       }
     ]
   }

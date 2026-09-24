@@ -1,67 +1,85 @@
 import QtQuick
 import Ryoku.PluginKit.Singletons
 
-// content/Panel.qml is the bar panel: when this plugin is on the bar and the
-// manifest declares entryPoints.panel, the host renders this file under the
-// plugin's glyph in the shared panel surface (Escape or an outside click closes
-// it, one panel open at a time). The host sets pluginApi, density ("full"), s,
-// widthBudget (from manifest panel.width) and active; report implicitHeight and
-// the host sizes the card to it.
+// content/Panel.qml: purely informative detail card, no buttons, no actions.
+// Opens under the glyph on click.
 Item {
     id: root
 
     property var pluginApi
     property string density: "full"
     property real s: 1
-    property real widthBudget: 320
+    property real widthBudget: 280
     property bool active: false
 
     readonly property var service: pluginApi ? pluginApi.mainInstance : null
-    readonly property int count: service ? service.count : 0
+    readonly property bool found: service ? service.found : false
+    readonly property string deviceName: service ? service.deviceName : ""
+    readonly property bool reachable: service ? service.reachable : false
+    readonly property int charge: service ? service.charge : -1
+    readonly property bool charging: service ? service.charging : false
+    readonly property int notifCount: service ? service.notifCount : 0
+    readonly property bool lastPollFailed: service ? service.lastPollFailed : false
 
     implicitWidth: root.widthBudget
     implicitHeight: col.implicitHeight + 24 * root.s
 
     Column {
         id: col
-        x: 12 * root.s
+        x: 14 * root.s
         y: 12 * root.s
-        width: root.width - 24 * root.s
-        spacing: 10 * root.s
+        width: root.width - 28 * root.s
+        spacing: 8 * root.s
 
         Text {
-            text: "Demo plugin"
+            text: "KDE Connect"
             color: Theme.bright
             font.family: Theme.display
             font.pixelSize: 16 * root.s
         }
 
         Text {
-            text: "Ticks: " + root.count
+            visible: !root.found
+            text: root.lastPollFailed ? "Could not reach kdeconnectd." : "No paired device found."
             color: Theme.dim
             font.family: Theme.font
             font.pixelSize: 13 * root.s
+            wrapMode: Text.WordWrap
+            width: parent.width
         }
 
-        Rectangle {
-            width: resetLabel.implicitWidth + 24 * root.s
-            height: resetLabel.implicitHeight + 12 * root.s
-            radius: Theme.radius
-            color: resetArea.pressed ? Theme.vermDeep : Theme.accent
+        Column {
+            visible: root.found
+            width: parent.width
+            spacing: 6 * root.s
 
             Text {
-                id: resetLabel
-                anchors.centerIn: parent
-                text: "RESET"
-                color: Theme.cardBot
+                text: root.deviceName || "Unknown device"
+                color: Theme.bright
+                font.family: Theme.font
+                font.pixelSize: 14 * root.s
+            }
+
+            Text {
+                text: root.reachable ? "Connected" : "Not reachable"
+                color: root.reachable ? Theme.accent : Theme.dim
                 font.family: Theme.font
                 font.pixelSize: 12 * root.s
             }
 
-            MouseArea {
-                id: resetArea
-                anchors.fill: parent
-                onClicked: if (root.service) root.service.reset()
+            Text {
+                visible: root.charge >= 0
+                text: "Battery: " + root.charge + "%" + (root.charging ? " (charging)" : "")
+                color: Theme.dim
+                font.family: Theme.font
+                font.pixelSize: 12 * root.s
+            }
+
+            Text {
+                text: "Notifications: " + root.notifCount
+                color: Theme.dim
+                font.family: Theme.font
+                font.pixelSize: 12 * root.s
             }
         }
     }
