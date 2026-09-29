@@ -30,11 +30,15 @@ Item {
     readonly property color glyphColor: Theme.accent
     readonly property real glyphOpacity: root.found ? (root.reachable ? 1 : 0.55) : 0.4
 
-    implicitWidth: row.implicitWidth
+    // Built-in bar widgets pad 9px per side; the plugin host pads only 6. Add 3
+    // per side so the gap to neighbouring widgets matches the built-ins.
+    readonly property real sidePad: 3 * root.s
+    implicitWidth: row.implicitWidth + 2 * root.sidePad
     implicitHeight: Math.max(row.implicitHeight, 18 * root.s)
 
     Row {
         id: row
+        x: root.sidePad
         anchors.verticalCenter: parent.verticalCenter
         spacing: 4 * root.s
 
