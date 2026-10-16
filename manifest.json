@@ -3,7 +3,7 @@
   "name": "KDE Connect",
   "version": "0.1.0",
   "author": "vampirejsv <vampirejsv@local>",
-  "description": "Live KDE Connect device status on the bar: connection, battery, unread notification count. Read-only, no actions.",
+  "description": "Live KDE Connect device status on the bar (connection, battery, unread count) with quick actions: messages, send file, clipboard, ping, find phone, open app.",
   "license": "MIT",
   "official": false,
   "hosts": [
@@ -33,7 +33,11 @@
   "dependencies": {
     "commands": [
       "busctl",
-      "jq"
+      "jq",
+      "kdeconnect-cli",
+      "kdeconnect-sms",
+      "kdeconnect-app",
+      "zenity"
     ]
   },
   "metadata": {

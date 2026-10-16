@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # Polls kdeconnectd over the user D-Bus for the first reachable+paired device
 # and prints one line of JSON the widget can parse directly:
-#   {"found":bool,"name":str,"reachable":bool,"charge":int,"charging":bool,"notifCount":int}
+#   {"found":bool,"id":str,"name":str,"reachable":bool,"charge":int,"charging":bool,"notifCount":int}
 # Read-only: every busctl call here is a Get/call on kdeconnectd's own
 # read-only properties and methods, nothing is ever set or sent.
+# Actions (messages, share, ping...) live in service/Main.qml, not here.
 set -euo pipefail
 
 fail_json() {
@@ -41,9 +42,10 @@ NOTIF_COUNT=$(busctl --user --json=short call "$DEST" "$BASE/notifications" \
     | jq -r '.data[0] | length' 2>/dev/null || echo 0)
 
 jq -nc \
+    --arg id "$DEVID" \
     --arg name "${NAME:-}" \
     --argjson reachable "${REACHABLE:-false}" \
     --argjson charge "${CHARGE:--1}" \
     --argjson charging "${CHARGING:-false}" \
     --argjson notifCount "${NOTIF_COUNT:-0}" \
-    '{found:true,name:$name,reachable:$reachable,charge:$charge,charging:$charging,notifCount:$notifCount}'
+    '{found:true,id:$id,name:$name,reachable:$reachable,charge:$charge,charging:$charging,notifCount:$notifCount}'

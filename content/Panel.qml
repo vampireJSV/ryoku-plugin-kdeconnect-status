@@ -1,8 +1,8 @@
 import QtQuick
 import Ryoku.PluginKit.Singletons
 
-// content/Panel.qml: purely informative detail card, no buttons, no actions.
-// Opens under the glyph on click.
+// content/Panel.qml: device detail card plus quick-action buttons (messages,
+// send file, clipboard, ping, find phone, open app). Opens under the glyph.
 Item {
     id: root
 
@@ -80,6 +80,55 @@ Item {
                 color: Theme.dim
                 font.family: Theme.font
                 font.pixelSize: 12 * root.s
+            }
+        }
+
+        Grid {
+            visible: root.found && root.reachable
+            width: parent.width
+            columns: 3
+            spacing: 6 * root.s
+            readonly property real cell: (width - 2 * spacing) / 3
+
+            Repeater {
+                model: [
+                    { label: "Messages", act: "openMessages" },
+                    { label: "Send file", act: "sendFile" },
+                    { label: "Clipboard", act: "sendClipboard" },
+                    { label: "Ping", act: "ping" },
+                    { label: "Find phone", act: "ring" },
+                    { label: "Open app", act: "openApp" }
+                ]
+
+                delegate: Rectangle {
+                    required property var modelData
+                    width: parent.cell
+                    height: 30 * root.s
+                    radius: 6 * root.s
+                    color: hit.containsMouse ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22)
+                                             : Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.10)
+                    border.width: 1
+                    border.color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.35)
+
+                    Text {
+                        anchors.centerIn: parent
+                        width: parent.width - 6 * root.s
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        text: parent.modelData.label
+                        color: Theme.bright
+                        font.family: Theme.font
+                        font.pixelSize: 11 * root.s
+                    }
+
+                    MouseArea {
+                        id: hit
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: if (root.service) root.service[parent.modelData.act]()
+                    }
+                }
             }
         }
     }
