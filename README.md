@@ -1,7 +1,7 @@
 # KDE Connect
 
-A Ryoku shell plugin (`kdeconnect-status`) that shows the live status of the
-first reachable/paired KDE Connect device on the bar: a connection glyph, the
+A Ryoku shell plugin (`kdeconnect-status`) that shows the live status of a
+paired KDE Connect device on the bar (pick which one in the panel when several are paired): a connection glyph, the
 device's battery percent, and its unread notification count. The panel also
 has quick-action buttons. Status polling is read-only; anything sent to the
 device happens only on an explicit button click.
@@ -15,7 +15,7 @@ device happens only on an explicit button click.
   hollow otherwise), the battery percent (with a bolt while charging), and a
   `(N)` unread-notification badge when N > 0. A left click only opens the
   panel.
-- **Panel** (`content/Panel.qml`): the device name, connection state, battery,
+- **Panel** (`content/Panel.qml`): a device select (dropdown, shown with 2+ paired devices; the choice is remembered in `$XDG_STATE_HOME/ryoku/plugins/kdeconnect-status/selected-device`), the device name, connection state, battery,
   and notification count, plus buttons (shown when the device is reachable):
 
   | button     | runs                                              |
@@ -43,8 +43,9 @@ Reads only, over the user session D-Bus, via `bin/poll.sh`:
 
 `bin/poll.sh` never calls a KDE Connect method that sends anything. The
 actions above run only from the panel buttons, in `service/Main.qml`. The
-plugin never writes any file itself;
-all output is a single JSON line to stdout that `service/Main.qml` parses.
+only file the plugin writes is the selected device id
+(`selected-device`, under its `stateDir`). The poll output is a single JSON line
+to stdout that `service/Main.qml` parses.
 Settings are read through `pluginApi.pluginSettings` behind a default and
 written only through `pluginApi.saveSetting` (the settings panel the bar
 renders); the plugin itself never edits `shell.json` or `plugins.json`.
